@@ -17,21 +17,21 @@ This is an example file.
 - vscode:
     # e.x. code, code-insiders, codium
     exec: code
+    uninstall-not-listed: false
     extensions:
-        dbaeumer.vscode-eslint:
-            status: install
-        eamodio.gitlens:
-            status: uninstall
-        eg2.tslint:
-            status: install
+        - dbaeumer.vscode-eslint:
+        - eamodio.gitlens:
+        - eg2.tslint:
 
 - vscodefile:
     exec: code
     file: Vscodefile
+    uninstall-not-listed: false
 
 - vscodefile:
     exec: code-insiders
     file: Vscodefile
+    uninstall-not-listed: false
 ```
 
 For `vscode` directive, you ought to specify the operation to install or uninstall, default is install.
@@ -39,3 +39,17 @@ For `vscode` directive, you ought to specify the operation to install or uninsta
 For `vscodefile` directive, you ought to generate a vscodefile using `code --list-extensions > $DIR/vscodefile` command.
 
 In other place, you run `./install -p dotbot-vscode/vscode.py -c vscode.packages.conf.yaml`, `dotbot-vscode` will uninstall the extensions which are installed but not in `vscodefile`, and install the extensions which are not installed but in `vscodefile`.
+
+### Defaults
+
+#### vscode
+
+- `exec: code`
+- `uninstall-not-listed: false`
+- `extensions: []`
+
+#### vscodefile
+
+- `file` - REQUIRED
+- `exec: code`
+- `uninstall-not-listed: false`

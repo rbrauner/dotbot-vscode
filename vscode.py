@@ -10,6 +10,12 @@ class VSCode(dotbot.Plugin):
     DIRECTIVE_VSCODE = "vscode"
     DIRECTIVE_VSCODE_FILE = "vscodefile"
 
+    DEFAULTS = {
+        "exec": "code",
+        "uninstall-not-listed": False,
+        "extensions": []
+    }
+
     def can_handle(self, directive):
         return directive in (self.DIRECTIVE_VSCODE, self.DIRECTIVE_VSCODE_FILE)
 
@@ -20,54 +26,36 @@ class VSCode(dotbot.Plugin):
             return self._handle_vscode(data)
 
     def _handle_vscodefile(self, data):
-        if not isinstance(data, dict) or len(data) > 2:
-            self._log.error("Error format, please refer to documentation.")
-            return False
-        elif len(data) == 2 and ("file" not in data or "exec" not in data):
-            self._log.error("Error format, please refer to documentation.")
-            return False
-        elif "file" not in data:
+        if not isinstance(data, dict):
             self._log.error("Error format, please refer to documentation.")
             return False
 
-        exec = data['exec']
-        code = VSCodeInstance(exec)
-        vsfile = data["file"]
-        return self._sync_vscodefile(vsfile, code)
+        exec = data['exec'] if 'exec' in data else self.DEFAULTS['exec']
+        uninstall_not_listed = data['uninstall-not-listed'] if 'uninstall-not-listed' in data else self.DEFAULTS['uninstall-not-listed']
+        vsfile = data['file'] if 'file' in data else None
+
+        if exec is None or not isinstance(uninstall_not_listed, bool) or vsfile is None:
+            self._log.error("Error format, please refer to documentation.")
+            return False
+
+        extensions = self._vscodefile_extensions(vsfile)
+
+        return self._sync(extensions, exec, uninstall_not_listed)
 
     def _handle_vscode(self, data):
         if not isinstance(data, dict):
             self._log.error("Error format, please refer to documentation.")
             return False
 
-        exec = data['exec']
-        extensions = data['extensions']
-        if not isinstance(extensions, dict):
+        exec = data['exec'] if 'exec' in data else  self.DEFAULTS['exec']
+        uninstall_not_listed = data['uninstall-not-listed'] if 'uninstall-not-listed' in data else self.DEFAULTS['uninstall-not-listed']
+        extensions = data['extensions'] if 'extensions' in data else self.DEFAULTS['extensions']
+
+        if exec is None or not isinstance(uninstall_not_listed, bool) or not isinstance(extensions, list):
             self._log.error("Error format, please refer to documentation.")
             return False
 
-        for extension in extensions:
-            extension_status = extensions[extension]
-            if not isinstance(extension_status, dict) or len(extension_status) > 1:
-                self._log.error("Error format, please refer to documentation.")
-                return False
-            elif "status" not in extension_status:
-                self._log.error("Error format, please refer to documentation.")
-                return False
-
-            code = VSCodeInstance(exec)
-            try:
-                if extension_status["status"] == "install":
-                    code.install(extension)
-                elif extension_status["status"] == "uninstall":
-                    code.uninstall(extension)
-                else:
-                    self._log.error("Error format, please refer to documentation.")
-                    return False
-            except VSCodeError as e:
-                self.log.error(e.message)
-                return False
-        return True
+        return self._sync(extensions, exec, uninstall_not_listed)
 
     def _vscodefile_extensions(self, vsfile):
         try:
@@ -80,22 +68,20 @@ class VSCode(dotbot.Plugin):
 
         return result
 
-    def _sync_vscodefile(self, vsfile, code):
-        vscodefile_extensions = self._vscodefile_extensions(vsfile)
-
-        if not vscodefile_extensions:
-            return False
-
-        need_install, need_remove = [], []
+    def _sync(self, extensions, exec, uninstall_not_listed):
         try:
-            installed_extensions = code.installed_extensions()
-            for extension in installed_extensions:
-                if extension.lower() not in vscodefile_extensions:
-                    need_remove.append(extension)
+            code = VSCodeInstance(exec)
 
-            for extension in vscodefile_extensions:
-                if extension.lower() not in installed_extensions:
-                    need_install.append(extension)
+            installed_extensions = code.installed_extensions()
+            need_install = []
+            need_remove = []
+
+            # need install
+            need_install = [e for e in extensions if e.lower() not in installed_extensions]
+
+            # need remove
+            if uninstall_not_listed:
+                need_remove = [e for e in installed_extensions if e.lower() not in extensions]
 
             for extension in need_install:
                 code.install(extension)
