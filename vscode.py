@@ -42,28 +42,14 @@ class VSCode(dotbot.Plugin):
 
         exec = data['exec']
         extensions = data['extensions']
-        if not isinstance(extensions, dict):
+        if not isinstance(extensions, list):
             self._log.error("Error format, please refer to documentation.")
             return False
 
         for extension in extensions:
-            extension_status = extensions[extension]
-            if not isinstance(extension_status, dict) or len(extension_status) > 1:
-                self._log.error("Error format, please refer to documentation.")
-                return False
-            elif "status" not in extension_status:
-                self._log.error("Error format, please refer to documentation.")
-                return False
-
-            code = VSCodeInstance(exec)
             try:
-                if extension_status["status"] == "install":
-                    code.install(extension)
-                elif extension_status["status"] == "uninstall":
-                    code.uninstall(extension)
-                else:
-                    self._log.error("Error format, please refer to documentation.")
-                    return False
+                code = VSCodeInstance(exec)
+                code.install(extension)
             except VSCodeError as e:
                 self.log.error(e.message)
                 return False

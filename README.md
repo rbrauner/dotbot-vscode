@@ -17,21 +17,21 @@ This is an example file.
 - vscode:
     # e.x. code, code-insiders, codium
     exec: code
+    uninstall-not-listed: false
     extensions:
-        dbaeumer.vscode-eslint:
-            status: install
-        eamodio.gitlens:
-            status: uninstall
-        eg2.tslint:
-            status: install
+        - dbaeumer.vscode-eslint:
+        - eamodio.gitlens:
+        - eg2.tslint:
 
 - vscodefile:
     exec: code
     file: Vscodefile
+    uninstall-not-listed: false
 
 - vscodefile:
     exec: code-insiders
     file: Vscodefile
+    uninstall-not-listed: false
 ```
 
 For `vscode` directive, you ought to specify the operation to install or uninstall, default is install.
