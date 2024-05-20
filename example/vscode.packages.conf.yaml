@@ -1,18 +1,18 @@
 - vscode:
-    dbaeumer.vscode-eslint:
-        status: install
-        insiders: true
-    eamodio.gitlens:
-        status: uninstall
-        insiders: true
-    eg2.tslint:
-        status: install
-        insiders: false
+    # e.x. code, code-insiders, codium
+    exec: code
+    extensions:
+        dbaeumer.vscode-eslint:
+            status: install
+        eamodio.gitlens:
+            status: uninstall
+        eg2.tslint:
+            status: install
 
 - vscodefile:
+    exec: code
     file: Vscodefile
-    insiders: true
 
 - vscodefile:
+    exec: code-insiders
     file: Vscodefile
-    insiders: false

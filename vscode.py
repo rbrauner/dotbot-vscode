@@ -30,18 +30,15 @@ class VSCode(dotbot.Plugin):
         if not isinstance(data, dict) or len(data) > 2:
             self._log.error("Error format, please refer to documentation.")
             return False
-        elif len(data) == 2 and ("file" not in data or "insiders" not in data):
+        elif len(data) == 2 and ("file" not in data or "exec" not in data):
             self._log.error("Error format, please refer to documentation.")
             return False
         elif "file" not in data:
             self._log.error("Error format, please refer to documentation.")
             return False
 
-        if "insiders" not in data:
-            insiders = False
-        else:
-            insiders = data["insiders"]
-        code = VSCodeInstance(insiders)
+        exec = data['exec']
+        code = VSCodeInstance(exec)
         vsfile = data["file"]
         return self._sync_vscodefile(vsfile, code)
 
@@ -49,25 +46,23 @@ class VSCode(dotbot.Plugin):
         if not isinstance(data, dict):
             self._log.error("Error format, please refer to documentation.")
             return False
-        for extension in data:
-            extension_status = data[extension]
-            if not isinstance(extension_status, dict) or len(extension_status) > 2:
-                self._log.error("Error format, please refer to documentation.")
-                return False
-            elif len(extension_status) == 2 and (
-                "status" not in extension_status or "insiders" not in extension_status
-            ):
+
+        exec = data['exec']
+        extensions = data['extensions']
+        if not isinstance(extensions, dict):
+            self._log.error("Error format, please refer to documentation.")
+            return False
+
+        for extension in extensions:
+            extension_status = extensions[extension]
+            if not isinstance(extension_status, dict) or len(extension_status) > 1:
                 self._log.error("Error format, please refer to documentation.")
                 return False
             elif "status" not in extension_status:
                 self._log.error("Error format, please refer to documentation.")
                 return False
 
-            if "insiders" not in extension_status:
-                insiders = False
-            else:
-                insiders = extension_status["insiders"]
-            code = VSCodeInstance(insiders)
+            code = VSCodeInstance(exec)
             try:
                 if extension_status["status"] == "install":
                     code.install(extension)
@@ -121,13 +116,9 @@ class VSCode(dotbot.Plugin):
 
 
 class VSCodeInstance(object):
-    def __init__(self, insiders=False):
-        if not insiders:
-            self._name = "Visual Studio Code"
-            self._binary = which("code")
-        else:
-            self._name = "Visual Studio Code Insiders"
-            self._binary = which("code-insiders")
+    def __init__(self, exec):
+        self._exec = exec if exec else "code"
+        self._binary = which(self._exec)
 
     @property
     def installed(self):
@@ -135,7 +126,7 @@ class VSCodeInstance(object):
 
     def installed_extensions(self):
         if not self.installed:
-            raise VSCodeError("{} is not installed.".format(self._name))
+            raise VSCodeError("{} is not installed.".format(self._exec))
         output = check_output([self._binary, "--list-extensions"]).decode(
             sys.getdefaultencoding()
         )
@@ -144,12 +135,12 @@ class VSCodeInstance(object):
 
     def install(self, extension):
         if not self.installed:
-            raise VSCodeError("{} is not installed.".format(self._name))
+            raise VSCodeError("{} is not installed.".format(self._exec))
         call([self._binary, "--install-extension", extension])
 
     def uninstall(self, extension):
         if not self.installed:
-            raise VSCodeError("{} is not installed.".format(self._name))
+            raise VSCodeError("{} is not installed.".format(self._exec))
         call([self._binary, "--uninstall-extension", extension])
 
 
