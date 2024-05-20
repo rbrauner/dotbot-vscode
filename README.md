@@ -5,7 +5,7 @@ Plugin for [dotbot](https://github.com/anishathalye/dotbot). dotbot-vscode adds 
 ## Installation
 
 1. Add this plugin to your dotfiles repository as a git submodule
-    `git submodule add https://github.com/hujianxin/dotbot-vscode`
+    `git submodule add https://github.com/rbrauner/dotbot-vscode`
 2. Add `vsocde` or `vscodefile` directive to your config file
 3. Edit you `install` script to change like this `"${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}" -d "${BASEDIR}" --plugin-dir dotbot-vscode -c "${CONFIG}" "${@}"`
 

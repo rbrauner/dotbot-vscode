@@ -2,16 +2,9 @@
 import os
 import sys
 import dotbot
+import shutil
 
 from subprocess import check_output, call
-
-
-sys.path.append(
-    os.path.join(os.path.dirname(os.path.realpath(__file__)), "lib", "whichcraft")
-)
-
-from whichcraft import which
-
 
 class VSCode(dotbot.Plugin):
     DIRECTIVE_VSCODE = "vscode"
@@ -118,7 +111,7 @@ class VSCode(dotbot.Plugin):
 class VSCodeInstance(object):
     def __init__(self, exec):
         self._exec = exec if exec else "code"
-        self._binary = which(self._exec)
+        self._binary = shutil.which(self._exec)
 
     @property
     def installed(self):
