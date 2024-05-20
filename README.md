@@ -39,3 +39,17 @@ For `vscode` directive, you ought to specify the operation to install or uninsta
 For `vscodefile` directive, you ought to generate a vscodefile using `code --list-extensions > $DIR/vscodefile` command.
 
 In other place, you run `./install -p dotbot-vscode/vscode.py -c vscode.packages.conf.yaml`, `dotbot-vscode` will uninstall the extensions which are installed but not in `vscodefile`, and install the extensions which are not installed but in `vscodefile`.
+
+### Defaults
+
+#### vscode
+
+- `exec: code`
+- `uninstall-not-listed: false`
+- `extensions: []`
+
+#### vscodefile
+
+- `file` - REQUIRED
+- `exec: code`
+- `uninstall-not-listed: false`
