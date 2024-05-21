@@ -19,9 +19,9 @@ This is an example file.
     exec: code
     uninstall-not-listed: false
     extensions:
-        - dbaeumer.vscode-eslint:
-        - eamodio.gitlens:
-        - eg2.tslint:
+        - dbaeumer.vscode-eslint
+        - eamodio.gitlens
+        - eg2.tslint
 
 - vscodefile:
     exec: code
